@@ -1,6 +1,5 @@
 package de.herglotz.uuid.ui;
 
-import java.awt.Color;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
@@ -26,7 +25,6 @@ public class AlertDialog {
 		dialog.setUndecorated(true);
 		dialog.setSize(200, 100);
 		dialog.setAlwaysOnTop(true);
-		dialog.setBackground(Color.RED);
 	}
 
 	private void moveDialogToBottomRight() {
