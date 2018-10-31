@@ -1,30 +1,62 @@
 package de.herglotz.uuid;
 
-import java.awt.FlowLayout;
+import java.awt.AWTException;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
 import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Optional;
 
-import javax.swing.JFrame;
+import javax.imageio.ImageIO;
 
 import de.herglotz.uuid.jni.GlobalKeyListener;
 import de.herglotz.uuid.jni.KeyEvent;
 
 public class UUIDTranslator {
 
+	private TrayIcon trayIcon;
+	private final ElementCache elementCache;
+
 	public UUIDTranslator() {
+		elementCache = new ElementCache();
 		createFrame();
 		registerListener();
 	}
 
 	private void createFrame() {
-		JFrame mainFrame = new JFrame("UUID Translator");
-		mainFrame.setLayout(new FlowLayout());
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		mainFrame.setVisible(true);
-		mainFrame.setSize(400, 200);
+		if (!SystemTray.isSupported()) {
+			System.err.println("SystemTray is no supported. Exiting...");
+			System.exit(1);
+		}
+
+		try {
+			trayIcon = new TrayIcon(getImageForTrayIcon(), "UUID Translator", buildPopupMenu());
+			SystemTray.getSystemTray().add(trayIcon);
+		} catch (AWTException e) {
+			System.err.println("Error adding TrayIcon to SystemTray. Exiting...");
+			System.exit(1);
+		}
+	}
+
+	private BufferedImage getImageForTrayIcon() {
+		try {
+			return ImageIO.read(this.getClass().getClassLoader().getResource("icons/trayicon.png"));
+		} catch (IOException e) {
+			return new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
+		}
+	}
+
+	private PopupMenu buildPopupMenu() {
+		PopupMenu menu = new PopupMenu();
+		menu.add(new SelectWorkspaceIcon(elementCache));
+		menu.addSeparator();
+		menu.add(new ExitIcon(trayIcon));
+		return menu;
 	}
 
 	private void registerListener() {
@@ -34,7 +66,8 @@ public class UUIDTranslator {
 
 	private void searchForId() {
 		String content = getClipboardContent();
-		System.out.println(content);
+		Optional<String> name = elementCache.get(content);
+		System.out.println(name.orElse("Unknown Id"));
 	}
 
 	private String getClipboardContent() {
