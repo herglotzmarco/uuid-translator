@@ -1,4 +1,4 @@
-package de.herglotz.uuid;
+package de.herglotz.uuid.ui;
 
 import java.awt.MenuItem;
 import java.awt.SystemTray;
