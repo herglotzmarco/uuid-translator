@@ -9,11 +9,16 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.herglotz.uuid.UUIDTranslator;
 import de.herglotz.uuid.jni.GlobalKeyListener;
 import de.herglotz.uuid.jni.KeyEvent;
 
 public class TrayApplication {
+
+	private static final Logger LOG = LoggerFactory.getLogger(TrayApplication.class);
 
 	private TrayIcon trayIcon;
 	private AlertDialog dialog;
@@ -28,7 +33,7 @@ public class TrayApplication {
 
 	private void createFrame() {
 		if (!SystemTray.isSupported()) {
-			System.err.println("SystemTray is no supported. Exiting...");
+			LOG.error("SystemTray is no supported. Exiting...");
 			System.exit(1);
 		}
 
@@ -36,7 +41,7 @@ public class TrayApplication {
 			trayIcon = new TrayIcon(getImageForTrayIcon(), "UUID Translator", buildPopupMenu());
 			SystemTray.getSystemTray().add(trayIcon);
 		} catch (AWTException e) {
-			System.err.println("Error adding TrayIcon to SystemTray. Exiting...");
+			LOG.error("Error adding TrayIcon to SystemTray. Exiting...");
 			System.exit(1);
 		}
 	}

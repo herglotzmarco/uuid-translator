@@ -6,9 +6,8 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.Set;
-import java.util.UUID;
 
 public class UUIDTranslator {
 
@@ -19,17 +18,15 @@ public class UUIDTranslator {
 	}
 
 	public void updateElements(Set<File> files) {
-		// TODO: implement real update
-		elementCache.clear();
-		elementCache.put(UUID.randomUUID().toString(), "Blubb");
-		elementCache.put(UUID.randomUUID().toString(), "Bla");
-		elementCache.put(UUID.randomUUID().toString(), "Fasel");
+		files.stream()//
+				.map(ElementParser::readAndParse)//
+				.flatMap(Collection::stream)//
+				.forEach(p -> elementCache.put(p.getKey(), p.getValue()));
 	}
 
 	public String searchForId() {
-		String content = getClipboardContent();
-		Optional<String> name = elementCache.get(content);
-		return name.orElse("Unknown Id");
+		// TODO: Check if it is an id, otherwise we don't need to do anything
+		return elementCache.getResultOrErrorMessage(getClipboardContent());
 	}
 
 	private String getClipboardContent() {
@@ -37,7 +34,6 @@ public class UUIDTranslator {
 		try {
 			return clipboard.getData(DataFlavor.stringFlavor).toString();
 		} catch (UnsupportedFlavorException | IOException e) {
-			e.printStackTrace();
 			return "";
 		}
 	}

@@ -3,14 +3,17 @@ package de.herglotz.uuid.jni;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GlobalKeyListener implements NativeKeyListener {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GlobalKeyListener.class);
 
 	private static GlobalKeyListener instance;
 
@@ -30,13 +33,13 @@ public class GlobalKeyListener implements NativeKeyListener {
 			adaptGlobalScreenLogging();
 			GlobalScreen.addNativeKeyListener(this);
 		} catch (NativeHookException e) {
-			System.err.println("Registering native keylistener failed. Exiting...");
+			LOG.error("Registering native keylistener failed. Exiting...");
 			System.exit(1);
 		}
 	}
 
 	private void adaptGlobalScreenLogging() {
-		Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+		java.util.logging.Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
 		logger.setLevel(Level.WARNING);
 		logger.setUseParentHandlers(false);
 	}
