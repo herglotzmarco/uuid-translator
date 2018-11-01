@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.herglotz.uuid.SearchResult;
 import de.herglotz.uuid.UUIDTranslator;
 import de.herglotz.uuid.jni.GlobalKeyListener;
 import de.herglotz.uuid.jni.KeyEvent;
@@ -68,7 +69,13 @@ public class TrayApplication {
 	}
 
 	private void searchForId() {
-		dialog.showPopup(translator.searchForId());
+		SearchResult result = translator.searchForId();
+		if (result.hasError()) {
+			// TODO: Error handling
+			dialog.showPopup(result.getErrorMessage());
+		} else {
+			dialog.showPopup(result.getName());
+		}
 	}
 
 }

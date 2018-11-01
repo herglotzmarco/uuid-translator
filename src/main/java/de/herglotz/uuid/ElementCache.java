@@ -22,17 +22,21 @@ public class ElementCache {
 		elements.put(id, name);
 	}
 
-	public String getResultOrErrorMessage(String content) {
+	public SearchResult findElementContaining(String content) {
+		String element = elements.get(content);
+		if (element != null) {
+			return SearchResult.ok(element);
+		}
 		List<String> possibilities = elements.entrySet().parallelStream()//
 				.filter(e -> e.getKey().contains(content))//
 				.map(Entry::getValue)//
 				.collect(Collectors.toList());
 		if (possibilities.size() > 1) {
-			return String.format("%s possible results for Id [%s]", possibilities.size(), content);
+			return SearchResult.multipleResults(possibilities.size(), content);
 		} else if (possibilities.size() == 1) {
-			return possibilities.get(0);
+			return SearchResult.ok(possibilities.get(0));
 		} else {
-			return String.format("Id containing [%s] is not present in selected workspace", content);
+			return SearchResult.noResult(content);
 		}
 	}
 

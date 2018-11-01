@@ -24,9 +24,9 @@ public class UUIDTranslator {
 				.forEach(p -> elementCache.put(p.getKey(), p.getValue()));
 	}
 
-	public String searchForId() {
+	public SearchResult searchForId() {
 		// TODO: Check if it is an id, otherwise we don't need to do anything
-		return elementCache.getResultOrErrorMessage(getClipboardContent());
+		return elementCache.findElementContaining(getClipboardContent());
 	}
 
 	private String getClipboardContent() {
