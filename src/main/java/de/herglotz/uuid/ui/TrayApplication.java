@@ -3,7 +3,11 @@ package de.herglotz.uuid.ui;
 import java.awt.AWTException;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
@@ -69,12 +73,24 @@ public class TrayApplication {
 	}
 
 	private void searchForId() {
-		SearchResult result = translator.searchForId();
+		SearchResult result = translator.searchForId(getClipboardContent().trim());
+		if (result == null) {
+			return;
+		}
 		if (result.hasError()) {
-			// TODO: Error handling
+			// TODO: Better error reporting
 			dialog.showPopup(result.getErrorMessage());
 		} else {
 			dialog.showPopup(result.getName());
+		}
+	}
+
+	private String getClipboardContent() {
+		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+		try {
+			return clipboard.getData(DataFlavor.stringFlavor).toString();
+		} catch (UnsupportedFlavorException | IOException e) {
+			return "";
 		}
 	}
 

@@ -1,11 +1,6 @@
 package de.herglotz.uuid;
 
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -24,18 +19,18 @@ public class UUIDTranslator {
 				.forEach(p -> elementCache.put(p.getKey(), p.getValue()));
 	}
 
-	public SearchResult searchForId() {
-		// TODO: Check if it is an id, otherwise we don't need to do anything
-		return elementCache.findElementContaining(getClipboardContent());
+	public SearchResult searchForId(String searchString) {
+		if (isPossibleUUID(searchString)) {
+			return elementCache.findElementContaining(searchString);
+		} else {
+			return null;
+		}
 	}
 
-	private String getClipboardContent() {
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-		try {
-			return clipboard.getData(DataFlavor.stringFlavor).toString();
-		} catch (UnsupportedFlavorException | IOException e) {
-			return "";
-		}
+	private boolean isPossibleUUID(String searchString) {
+		boolean isId = searchString.length() >= 4; // at least 4 digits
+		isId &= searchString.matches("[\\-0-9a-fA-F]+"); // only hex digits or minus sign
+		return isId;
 	}
 
 }
