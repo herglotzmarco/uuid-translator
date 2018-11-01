@@ -9,7 +9,11 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.imageio.ImageIO;
 
@@ -29,9 +33,12 @@ public class TrayApplication {
 	private AlertDialog dialog;
 	private UUIDTranslator translator;
 
+	private ExecutorService executorService;
+
 	public TrayApplication() {
 		dialog = new AlertDialog();
 		translator = new UUIDTranslator();
+		executorService = Executors.newFixedThreadPool(2);
 		createFrame();
 		registerListener();
 	}
@@ -45,6 +52,7 @@ public class TrayApplication {
 		try {
 			trayIcon = new TrayIcon(getImageForTrayIcon(), "UUID Translator", buildPopupMenu());
 			SystemTray.getSystemTray().add(trayIcon);
+			LOG.info("Tray Application started");
 		} catch (AWTException e) {
 			LOG.error("Error adding TrayIcon to SystemTray. Exiting...");
 			System.exit(1);
@@ -55,25 +63,35 @@ public class TrayApplication {
 		try {
 			return ImageIO.read(this.getClass().getClassLoader().getResource("icons/trayicon.png"));
 		} catch (IOException e) {
+			LOG.warn("Icon for Tray Application could not be found", e);
 			return new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
 		}
 	}
 
 	private PopupMenu buildPopupMenu() {
 		PopupMenu menu = new PopupMenu();
-		menu.add(new SelectWorkspaceIcon(translator::updateElements));
+		menu.add(new SelectWorkspaceIcon(this::updateElements));
 		menu.addSeparator();
 		menu.add(new ExitIcon(trayIcon));
 		return menu;
 	}
 
-	private void registerListener() {
-		GlobalKeyListener listener = GlobalKeyListener.instance();
-		listener.registerListener(new KeyEvent(true, false, "C"), this::searchForId);
+	private void updateElements(Set<File> files) {
+		executorService.execute(() -> translator.updateElements(files));
 	}
 
-	private void searchForId() {
-		SearchResult result = translator.searchForId(getClipboardContent().trim());
+	private void registerListener() {
+		GlobalKeyListener listener = GlobalKeyListener.instance();
+		listener.registerListener(new KeyEvent(true, false, "C"), this::searchForUUID);
+	}
+
+	private void searchForUUID() {
+		String searchString = getClipboardContent().trim();
+		executorService.execute(() -> searchForUUID(searchString));
+	}
+
+	private void searchForUUID(String searchString) {
+		SearchResult result = translator.searchForId(searchString);
 		if (result == null) {
 			return;
 		}
@@ -90,6 +108,7 @@ public class TrayApplication {
 		try {
 			return clipboard.getData(DataFlavor.stringFlavor).toString();
 		} catch (UnsupportedFlavorException | IOException e) {
+			LOG.warn("Reading ClipboardContent failed", e);
 			return "";
 		}
 	}

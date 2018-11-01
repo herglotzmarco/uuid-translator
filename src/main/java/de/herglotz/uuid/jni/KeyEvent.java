@@ -55,4 +55,9 @@ public class KeyEvent {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "[" + (ctrlPressed ? "Ctrl+" : "") + (shiftPressed ? "Shift+" : "") + key + "]";
+	}
+
 }

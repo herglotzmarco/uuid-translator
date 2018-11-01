@@ -4,7 +4,12 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class UUIDTranslator {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UUIDTranslator.class);
 
 	private final ElementCache elementCache;
 
@@ -13,6 +18,7 @@ public class UUIDTranslator {
 	}
 
 	public void updateElements(Set<File> files) {
+		LOG.debug("Updating registry for new workspace");
 		files.stream()//
 				.map(ElementParser::readAndParse)//
 				.flatMap(Collection::stream)//
@@ -20,9 +26,12 @@ public class UUIDTranslator {
 	}
 
 	public SearchResult searchForId(String searchString) {
+		LOG.debug("Searching for String [{}]", searchString);
 		if (isPossibleUUID(searchString)) {
+			LOG.debug("String [{}] was a valid UUID. Searching registry", searchString);
 			return elementCache.findElementContaining(searchString);
 		} else {
+			LOG.debug("String [{}] was not a valid UUID. Search cancelled", searchString);
 			return null;
 		}
 	}

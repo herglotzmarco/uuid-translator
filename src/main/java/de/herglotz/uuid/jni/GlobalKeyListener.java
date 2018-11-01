@@ -32,6 +32,7 @@ public class GlobalKeyListener implements NativeKeyListener {
 			GlobalScreen.registerNativeHook();
 			adaptGlobalScreenLogging();
 			GlobalScreen.addNativeKeyListener(this);
+			LOG.info("Global KeyListener registered");
 		} catch (NativeHookException e) {
 			LOG.error("Registering native keylistener failed. Exiting...");
 			System.exit(1);
@@ -46,10 +47,12 @@ public class GlobalKeyListener implements NativeKeyListener {
 
 	public void registerListener(KeyEvent key, Runnable runnable) {
 		listeners.put(key, runnable);
+		LOG.info("KeyListener registered for {}", key);
 	}
 
 	public void unregisterListener(KeyEvent key) {
 		listeners.remove(key);
+		LOG.info("KeyListener unregistered for {}", key);
 	}
 
 	@Override
@@ -65,7 +68,9 @@ public class GlobalKeyListener implements NativeKeyListener {
 		boolean ctrlPressed = (nativeEvent.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0;
 		boolean shiftPressed = (nativeEvent.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0;
 		KeyEvent key = new KeyEvent(ctrlPressed, shiftPressed, NativeKeyEvent.getKeyText(nativeEvent.getKeyCode()));
+		LOG.trace("Incoming Key: {}", key);
 		if (listeners.containsKey(key)) {
+			LOG.debug("Calling listener for {}", key);
 			listeners.get(key).run();
 		}
 	}

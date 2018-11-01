@@ -6,7 +6,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ElementCache {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ElementCache.class);
 
 	private Map<String, String> elements;
 
@@ -22,21 +27,25 @@ public class ElementCache {
 		elements.put(id, name);
 	}
 
-	public SearchResult findElementContaining(String content) {
-		String element = elements.get(content);
+	public SearchResult findElementContaining(String searchString) {
+		String element = elements.get(searchString);
 		if (element != null) {
+			LOG.debug("Found perfect match for String [{}]", searchString);
 			return SearchResult.ok(element);
 		}
 		List<String> possibilities = elements.entrySet().parallelStream()//
-				.filter(e -> e.getKey().contains(content))//
+				.filter(e -> e.getKey().contains(searchString))//
 				.map(Entry::getValue)//
 				.collect(Collectors.toList());
 		if (possibilities.size() > 1) {
-			return SearchResult.multipleResults(possibilities.size(), content);
+			LOG.debug("Found multiple matches for String [{}]", searchString);
+			return SearchResult.multipleResults(possibilities.size(), searchString);
 		} else if (possibilities.size() == 1) {
+			LOG.debug("Found one match for String [{}]", searchString);
 			return SearchResult.ok(possibilities.get(0));
 		} else {
-			return SearchResult.noResult(content);
+			LOG.debug("Found no matches for String [{}]", searchString);
+			return SearchResult.noResult(searchString);
 		}
 	}
 
