@@ -1,4 +1,4 @@
-package de.herglotz.uuid;
+package de.herglotz.uuid.elements;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ElementParser {
+class ElementParser {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ElementParser.class);
 

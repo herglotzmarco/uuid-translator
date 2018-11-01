@@ -1,6 +1,6 @@
-package de.herglotz.uuid;
+package de.herglotz.uuid.elements;
 
-public class Pair<T1, T2> {
+class Pair<T1, T2> {
 
 	private T1 key;
 	private T2 value;

@@ -1,4 +1,4 @@
-package de.herglotz.uuid.ui;
+package de.herglotz.uuid.application;
 
 import java.awt.MenuItem;
 import java.awt.SystemTray;
@@ -6,7 +6,7 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ExitIcon extends MenuItem implements ActionListener {
+class ExitIcon extends MenuItem implements ActionListener {
 
 	private static final long serialVersionUID = -1577055642923363355L;
 	private TrayIcon trayIcon;

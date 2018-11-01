@@ -1,6 +1,4 @@
-package de.herglotz.uuid;
-
-import de.herglotz.uuid.ui.TrayApplication;
+package de.herglotz.uuid.application;
 
 public class Main {
 

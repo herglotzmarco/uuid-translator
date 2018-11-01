@@ -14,7 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class AlertDialog {
+public class AlertDialog implements ResultUI {
 
 	private static final int ALERT_WIDTH = 300;
 	private static final int ALERT_HEIGHT = 100;
@@ -52,7 +52,17 @@ public class AlertDialog {
 		contentPane.setBackground(new Color(100, 200, 255, 100));
 	}
 
-	public void showPopup(String name) {
+	@Override
+	public void showResult(String result) {
+		showPopup(result); // TODO: handle result differently from error
+	}
+
+	@Override
+	public void showError(String error) {
+		showPopup(error); // TODO: handle result differently from error
+	}
+
+	private void showPopup(String name) {
 		JLabel label = new JLabel(wrapText(name));
 		dialog.add(label);
 

@@ -1,4 +1,4 @@
-package de.herglotz.uuid.ui;
+package de.herglotz.uuid.application;
 
 import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
@@ -17,7 +17,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SelectWorkspaceIcon extends MenuItem {
+class SelectWorkspaceIcon extends MenuItem {
 
 	private static final long serialVersionUID = -1577055642923363355L;
 

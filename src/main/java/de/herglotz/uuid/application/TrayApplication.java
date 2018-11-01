@@ -1,4 +1,4 @@
-package de.herglotz.uuid.ui;
+package de.herglotz.uuid.application;
 
 import java.awt.AWTException;
 import java.awt.PopupMenu;
@@ -20,37 +20,39 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.herglotz.uuid.SearchResult;
-import de.herglotz.uuid.UUIDTranslator;
+import de.herglotz.uuid.elements.ElementRegistry;
 import de.herglotz.uuid.jni.GlobalKeyListener;
 import de.herglotz.uuid.jni.KeyEvent;
+import de.herglotz.uuid.search.SearchResult;
+import de.herglotz.uuid.search.UUIDSearcher;
+import de.herglotz.uuid.ui.AlertDialog;
+import de.herglotz.uuid.ui.ResultUI;
 
-public class TrayApplication {
+class TrayApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrayApplication.class);
 
-	private TrayIcon trayIcon;
-	private AlertDialog dialog;
-	private UUIDTranslator translator;
-
+	private ResultUI ui;
+	private ElementRegistry elementContainer;
 	private ExecutorService executorService;
 
 	public TrayApplication() {
-		dialog = new AlertDialog();
-		translator = new UUIDTranslator();
+		ui = new AlertDialog();
+		elementContainer = new ElementRegistry();
 		executorService = Executors.newFixedThreadPool(2);
-		createFrame();
-		registerListener();
+		registerTrayIcon();
+		registerKeyListener();
 	}
 
-	private void createFrame() {
+	private void registerTrayIcon() {
 		if (!SystemTray.isSupported()) {
 			LOG.error("SystemTray is no supported. Exiting...");
 			System.exit(1);
 		}
 
 		try {
-			trayIcon = new TrayIcon(getImageForTrayIcon(), "UUID Translator", buildPopupMenu());
+			TrayIcon trayIcon = new TrayIcon(getImageForTrayIcon(), "UUID Translator");
+			trayIcon.setPopupMenu(buildPopupMenu(trayIcon));
 			SystemTray.getSystemTray().add(trayIcon);
 			LOG.info("Tray Application started");
 		} catch (AWTException e) {
@@ -68,7 +70,7 @@ public class TrayApplication {
 		}
 	}
 
-	private PopupMenu buildPopupMenu() {
+	private PopupMenu buildPopupMenu(TrayIcon trayIcon) {
 		PopupMenu menu = new PopupMenu();
 		menu.add(new SelectWorkspaceIcon(this::updateElements));
 		menu.addSeparator();
@@ -77,10 +79,10 @@ public class TrayApplication {
 	}
 
 	private void updateElements(Set<File> files) {
-		executorService.execute(() -> translator.updateElements(files));
+		executorService.execute(() -> elementContainer.updateElements(files));
 	}
 
-	private void registerListener() {
+	private void registerKeyListener() {
 		GlobalKeyListener listener = GlobalKeyListener.instance();
 		listener.registerListener(new KeyEvent(true, false, "C"), this::searchForUUID);
 	}
@@ -91,15 +93,20 @@ public class TrayApplication {
 	}
 
 	private void searchForUUID(String searchString) {
-		SearchResult result = translator.searchForId(searchString);
-		if (result == null) {
-			return;
-		}
-		if (result.hasError()) {
-			// TODO: Better error reporting
-			dialog.showPopup(result.getErrorMessage());
-		} else {
-			dialog.showPopup(result.getName());
+		UUIDSearcher searcher = new UUIDSearcher(elementContainer);
+		SearchResult result = searcher.searchForUUID(searchString);
+		switch (result.getType()) {
+		case INVALID:
+			return; // no search was needed
+		case EMPTY:
+		case MULTIPLE:
+			ui.showError(result.getMessage());
+			break;
+		case ONE:
+			ui.showResult(result.getMessage());
+			break;
+		default:
+			throw new IllegalArgumentException("Unknown SearchResult type: " + result.getType());
 		}
 	}
 
