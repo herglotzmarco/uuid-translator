@@ -5,8 +5,6 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -14,7 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class AlertDialog implements ResultUI {
+public class AlertDialog {
 
 	private static final int ALERT_WIDTH = 300;
 	private static final int ALERT_HEIGHT = 100;
@@ -52,12 +50,10 @@ public class AlertDialog implements ResultUI {
 		contentPane.setBackground(new Color(200, 255, 255));
 	}
 
-	@Override
 	public void showResult(String result) {
 		showPopup(result); // TODO: handle result differently from error
 	}
 
-	@Override
 	public void showError(String error) {
 		showPopup(error); // TODO: handle result differently from error
 	}
@@ -67,14 +63,11 @@ public class AlertDialog implements ResultUI {
 		dialog.add(label);
 
 		dialog.setVisible(true);
-		Timer timer = new Timer(ALERT_TIMEOUT_MILLIS, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				dialog.remove(label);
-				dialog.validate();
-				if (dialog.getContentPane().getComponentCount() == 0) {
-					dialog.setVisible(false);
-				}
+		Timer timer = new Timer(ALERT_TIMEOUT_MILLIS, e -> {
+			dialog.remove(label);
+			dialog.validate();
+			if (dialog.getContentPane().getComponentCount() == 0) {
+				dialog.setVisible(false);
 			}
 		});
 		timer.setRepeats(false);

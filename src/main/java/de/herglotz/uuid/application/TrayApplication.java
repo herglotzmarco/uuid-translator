@@ -30,7 +30,6 @@ import de.herglotz.uuid.search.SearchResultType;
 import de.herglotz.uuid.search.UUIDSearcher;
 import de.herglotz.uuid.settings.Settings;
 import de.herglotz.uuid.ui.AlertDialog;
-import de.herglotz.uuid.ui.ResultUI;
 
 class TrayApplication {
 
@@ -38,7 +37,7 @@ class TrayApplication {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrayApplication.class);
 
-	private ResultUI ui;
+	private AlertDialog ui;
 	private ElementRegistry elementContainer;
 	private ExecutorService executorService;
 	private Settings settings;
