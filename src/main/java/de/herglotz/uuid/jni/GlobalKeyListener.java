@@ -50,11 +50,6 @@ public class GlobalKeyListener implements NativeKeyListener {
 		LOG.info("KeyListener registered for {}", key);
 	}
 
-	public void unregisterListener(KeyEvent key) {
-		listeners.remove(key);
-		LOG.info("KeyListener unregistered for {}", key);
-	}
-
 	@Override
 	public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
 	}
@@ -65,14 +60,17 @@ public class GlobalKeyListener implements NativeKeyListener {
 
 	@Override
 	public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-		boolean ctrlPressed = (nativeEvent.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0;
-		boolean shiftPressed = (nativeEvent.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0;
-		KeyEvent key = new KeyEvent(ctrlPressed, shiftPressed, NativeKeyEvent.getKeyText(nativeEvent.getKeyCode()));
+		KeyEvent key = KeyEvent.fromNativeKeyEvent(nativeEvent);
 		LOG.trace("Incoming Key: {}", key);
 		if (listeners.containsKey(key)) {
 			LOG.debug("Calling listener for {}", key);
 			listeners.get(key).run();
 		}
+	}
+
+	public void unregisterAll() {
+		listeners.clear();
+		LOG.info("Unregistered all KeyListeners");
 	}
 
 }

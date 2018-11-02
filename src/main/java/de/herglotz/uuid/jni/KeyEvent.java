@@ -1,5 +1,7 @@
 package de.herglotz.uuid.jni;
 
+import org.jnativehook.keyboard.NativeKeyEvent;
+
 public class KeyEvent {
 
 	private boolean ctrlPressed;
@@ -57,7 +59,32 @@ public class KeyEvent {
 
 	@Override
 	public String toString() {
-		return "[" + (ctrlPressed ? "Ctrl+" : "") + (shiftPressed ? "Shift+" : "") + key + "]";
+		return (ctrlPressed ? "Ctrl+" : "") + (shiftPressed ? "Shift+" : "") + key;
+	}
+
+	public static KeyEvent fromNativeKeyEvent(NativeKeyEvent nativeEvent) {
+		boolean ctrlPressed = (nativeEvent.getModifiers() & NativeKeyEvent.CTRL_MASK) != 0;
+		boolean shiftPressed = (nativeEvent.getModifiers() & NativeKeyEvent.SHIFT_MASK) != 0;
+		return new KeyEvent(ctrlPressed, shiftPressed, NativeKeyEvent.getKeyText(nativeEvent.getKeyCode()));
+	}
+
+	public static KeyEvent fromString(String string) {
+		String[] split = string.split("\\+");
+		boolean ctrl = false;
+		boolean shift = false;
+		String key = "";
+		for (String part : split) {
+			if (part.equals("Ctrl")) {
+				ctrl = true;
+				key = "Ctrl";
+			} else if (part.equals("Shift")) {
+				shift = true;
+				key = "Shift";
+			} else {
+				key = part;
+			}
+		}
+		return new KeyEvent(ctrl, shift, key);
 	}
 
 }

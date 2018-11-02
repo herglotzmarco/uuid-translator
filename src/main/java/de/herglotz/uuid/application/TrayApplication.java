@@ -25,10 +25,10 @@ import org.slf4j.LoggerFactory;
 
 import de.herglotz.uuid.elements.ElementRegistry;
 import de.herglotz.uuid.jni.GlobalKeyListener;
-import de.herglotz.uuid.jni.KeyEvent;
 import de.herglotz.uuid.search.SearchResult;
 import de.herglotz.uuid.search.SearchResultType;
 import de.herglotz.uuid.search.UUIDSearcher;
+import de.herglotz.uuid.settings.Settings;
 import de.herglotz.uuid.ui.AlertDialog;
 import de.herglotz.uuid.ui.ResultUI;
 
@@ -41,11 +41,13 @@ class TrayApplication {
 	private ResultUI ui;
 	private ElementRegistry elementContainer;
 	private ExecutorService executorService;
+	private Settings settings;
 
 	public TrayApplication() {
 		ui = new AlertDialog();
 		elementContainer = new ElementRegistry();
 		executorService = Executors.newFixedThreadPool(2);
+		settings = new Settings();
 		registerTrayIcon();
 		registerKeyListener();
 	}
@@ -79,6 +81,7 @@ class TrayApplication {
 	private PopupMenu buildPopupMenu(TrayIcon trayIcon) {
 		PopupMenu menu = new PopupMenu();
 		menu.add(new SelectWorkspaceIcon(this::updateElements));
+		menu.add(new SettingsIcon(settings, this::registerKeyListener));
 		menu.addSeparator();
 		menu.add(new ExitIcon(trayIcon));
 		return menu;
@@ -90,8 +93,8 @@ class TrayApplication {
 
 	private void registerKeyListener() {
 		GlobalKeyListener listener = GlobalKeyListener.instance();
-		listener.registerListener(new KeyEvent(true, false, "C"), this::searchForUUID);
-		listener.registerListener(new KeyEvent(true, false, "R"), this::replaceAllUUIDs);
+		listener.registerListener(settings.getSearchHotkey(), this::searchForUUID);
+		listener.registerListener(settings.getReplaceHotkey(), this::replaceAllUUIDs);
 	}
 
 	private void searchForUUID() {
