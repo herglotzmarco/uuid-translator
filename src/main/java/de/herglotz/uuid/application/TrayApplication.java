@@ -7,6 +7,7 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -24,11 +27,14 @@ import de.herglotz.uuid.elements.ElementRegistry;
 import de.herglotz.uuid.jni.GlobalKeyListener;
 import de.herglotz.uuid.jni.KeyEvent;
 import de.herglotz.uuid.search.SearchResult;
+import de.herglotz.uuid.search.SearchResultType;
 import de.herglotz.uuid.search.UUIDSearcher;
 import de.herglotz.uuid.ui.AlertDialog;
 import de.herglotz.uuid.ui.ResultUI;
 
 class TrayApplication {
+
+	private static final String UUID_REGEX = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 
 	private static final Logger LOG = LoggerFactory.getLogger(TrayApplication.class);
 
@@ -85,6 +91,7 @@ class TrayApplication {
 	private void registerKeyListener() {
 		GlobalKeyListener listener = GlobalKeyListener.instance();
 		listener.registerListener(new KeyEvent(true, false, "C"), this::searchForUUID);
+		listener.registerListener(new KeyEvent(true, false, "R"), this::replaceAllUUIDs);
 	}
 
 	private void searchForUUID() {
@@ -95,6 +102,10 @@ class TrayApplication {
 	private void searchForUUID(String searchString) {
 		UUIDSearcher searcher = new UUIDSearcher(elementContainer);
 		SearchResult result = searcher.searchForUUID(searchString);
+		processSearchResult(result);
+	}
+
+	private void processSearchResult(SearchResult result) {
 		switch (result.getType()) {
 		case INVALID:
 			return; // no search was needed
@@ -118,6 +129,37 @@ class TrayApplication {
 			LOG.warn("Reading ClipboardContent failed", e);
 			return "";
 		}
+	}
+
+	private void replaceAllUUIDs() {
+		String clipboard = getClipboardContent().trim();
+		executorService.execute(() -> replaceAllUUIDs(clipboard));
+	}
+
+	private void replaceAllUUIDs(String clipboard) {
+		LOG.debug("Replacing all UUIDs");
+		String result = doReplacement(clipboard);
+		setClipboardContent(result);
+		LOG.debug("Replacement complete.");
+		ui.showResult("Replacement complete.");
+	}
+
+	private String doReplacement(String clipboard) {
+		Matcher matcher = Pattern.compile(UUID_REGEX).matcher(clipboard);
+		String result = new String(clipboard);
+		UUIDSearcher searcher = new UUIDSearcher(elementContainer);
+		while (matcher.find()) {
+			String id = clipboard.substring(matcher.start(), matcher.end());
+			SearchResult search = searcher.searchForUUID(id);
+			if (search.getType() == SearchResultType.ONE) {
+				result = result.replace(id, search.getMessage());
+			}
+		}
+		return result;
+	}
+
+	private void setClipboardContent(String newContent) {
+		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(newContent), null);
 	}
 
 }
