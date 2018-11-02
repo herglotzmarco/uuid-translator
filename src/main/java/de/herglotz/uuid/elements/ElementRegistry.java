@@ -16,20 +16,23 @@ public class ElementRegistry {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ElementRegistry.class);
 
-	private Map<String, String> elements;
+	private Map<String, RegistryElement> elements;
+	private ElementParser parser;
 
 	public ElementRegistry() {
 		elements = new HashMap<>();
+		parser = null;
 	}
 
 	public Collection<String> findElementsContaining(String searchString) {
-		String element = elements.get(searchString);
+		RegistryElement element = elements.get(searchString);
 		if (element != null) {
-			return Collections.singleton(element);
+			return Collections.singleton(element.getName());
 		}
 		return elements.entrySet().parallelStream()//
 				.filter(e -> e.getKey().contains(searchString))//
 				.map(Entry::getValue)//
+				.map(RegistryElement::getName)//
 				.collect(Collectors.toList());
 	}
 
@@ -37,9 +40,10 @@ public class ElementRegistry {
 		LOG.debug("Updating registry for new workspace");
 		elements.clear();
 		files.stream()//
-				.map(ElementParser::readAndParse)//
+				.map(parser::readAndParse)//
 				.flatMap(Collection::stream)//
-				.forEach(p -> elements.put(p.getKey(), p.getValue()));
+				.forEach(e -> elements.put(e.getId(), e));
+		LOG.debug("Updating registry done");
 	}
 
 }
