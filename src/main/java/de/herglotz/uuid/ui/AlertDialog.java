@@ -49,7 +49,7 @@ public class AlertDialog implements ResultUI {
 	private void styleDialog() {
 		JPanel contentPane = (JPanel) dialog.getContentPane();
 		contentPane.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-		contentPane.setBackground(new Color(100, 200, 255, 100));
+		contentPane.setBackground(new Color(200, 255, 255));
 	}
 
 	@Override
@@ -70,8 +70,11 @@ public class AlertDialog implements ResultUI {
 		Timer timer = new Timer(ALERT_TIMEOUT_MILLIS, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				dialog.setVisible(false);
 				dialog.remove(label);
+				dialog.validate();
+				if (dialog.getContentPane().getComponentCount() == 0) {
+					dialog.setVisible(false);
+				}
 			}
 		});
 		timer.setRepeats(false);
