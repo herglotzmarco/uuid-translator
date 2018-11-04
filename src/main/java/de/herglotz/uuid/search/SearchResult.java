@@ -1,13 +1,21 @@
 package de.herglotz.uuid.search;
 
+import de.herglotz.uuid.elements.RegistryElement;
+
 public class SearchResult {
 
 	private SearchResultType type;
 	private String message;
+	private RegistryElement element;
 
 	private SearchResult(String message, SearchResultType type) {
 		this.type = type;
 		this.message = message;
+	}
+
+	public SearchResult(RegistryElement element, SearchResultType type) {
+		this.element = element;
+		this.type = type;
 	}
 
 	static SearchResult noResult(String searchString) {
@@ -15,8 +23,8 @@ public class SearchResult {
 				SearchResultType.EMPTY);
 	}
 
-	static SearchResult oneResult(String name) {
-		return new SearchResult(name, SearchResultType.ONE);
+	static SearchResult oneResult(RegistryElement element) {
+		return new SearchResult(element, SearchResultType.ONE);
 	}
 
 	static SearchResult multipleResults(int size, String searchString) {
@@ -36,6 +44,10 @@ public class SearchResult {
 
 	public SearchResultType getType() {
 		return type;
+	}
+
+	public RegistryElement getElement() {
+		return element;
 	}
 
 }

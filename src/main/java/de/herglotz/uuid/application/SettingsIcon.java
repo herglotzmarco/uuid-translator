@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 
 import de.herglotz.uuid.settings.Settings;
+import de.herglotz.uuid.ui.SettingsCheckbox;
 import de.herglotz.uuid.ui.SettingsChooser;
 
 class SettingsIcon extends MenuItem {
@@ -28,10 +29,11 @@ class SettingsIcon extends MenuItem {
 		JDialog dialog = new JDialog();
 		dialog.setTitle("Settings");
 		dialog.setVisible(true);
-		dialog.setLayout(new GridLayout(2, 2));
+		dialog.setLayout(new GridLayout(3, 2));
 
 		createSearchHotkeySetting(dialog);
 		createReplaceHotkeySetting(dialog);
+		createShowTypeCheckbox(dialog);
 		dialog.pack();
 	}
 
@@ -43,6 +45,11 @@ class SettingsIcon extends MenuItem {
 	private void createReplaceHotkeySetting(JDialog dialog) {
 		dialog.add(new Label("Replace Hotkey"));
 		dialog.add(new SettingsChooser(settings::getReplaceHotkey, settings::setReplaceHotkey, updateCallback));
+	}
+
+	private void createShowTypeCheckbox(JDialog dialog) {
+		dialog.add(new Label("Show Element Type"));
+		dialog.add(new SettingsCheckbox(settings::isShowType, settings::setShowType));
 	}
 
 }

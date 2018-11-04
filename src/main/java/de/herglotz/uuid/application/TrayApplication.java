@@ -120,7 +120,11 @@ class TrayApplication {
 			ui.showError(result.getMessage());
 			break;
 		case ONE:
-			ui.showMessage(result.getMessage());
+			String message = result.getElement().getName();
+			if (settings.isShowType()) {
+				message = result.getElement().getType() + " " + result.getElement().getName();
+			}
+			ui.showMessage(message);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown SearchResult type: " + result.getType());

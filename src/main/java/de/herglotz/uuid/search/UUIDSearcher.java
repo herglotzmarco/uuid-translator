@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.herglotz.uuid.elements.ElementRegistry;
+import de.herglotz.uuid.elements.RegistryElement;
 
 public class UUIDSearcher {
 
@@ -21,7 +22,7 @@ public class UUIDSearcher {
 		LOG.debug("Searching for String [{}]", searchString);
 		if (isPossibleUUID(searchString)) {
 			LOG.debug("String [{}] was a valid UUID. Searching registry", searchString);
-			Collection<String> searchResults = elementContainer.findElementsContaining(searchString);
+			Collection<RegistryElement> searchResults = elementContainer.findElementsContaining(searchString);
 			return processResults(searchResults, searchString);
 		} else {
 			LOG.debug("String [{}] was not a valid UUID. Search cancelled", searchString);
@@ -35,7 +36,7 @@ public class UUIDSearcher {
 		return isId;
 	}
 
-	private SearchResult processResults(Collection<String> searchResults, String searchString) {
+	private SearchResult processResults(Collection<RegistryElement> searchResults, String searchString) {
 		if (searchResults.size() > 1) {
 			LOG.debug("Found multiple matches for String [{}]", searchString);
 			return SearchResult.multipleResults(searchResults.size(), searchString);

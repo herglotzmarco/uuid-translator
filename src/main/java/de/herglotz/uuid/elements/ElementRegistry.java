@@ -24,15 +24,14 @@ public class ElementRegistry {
 		parser = null;
 	}
 
-	public Collection<String> findElementsContaining(String searchString) {
+	public Collection<RegistryElement> findElementsContaining(String searchString) {
 		RegistryElement element = elements.get(searchString);
 		if (element != null) {
-			return Collections.singleton(element.getName());
+			return Collections.singleton(element);
 		}
 		return elements.entrySet().parallelStream()//
 				.filter(e -> e.getKey().contains(searchString))//
 				.map(Entry::getValue)//
-				.map(RegistryElement::getName)//
 				.collect(Collectors.toList());
 	}
 

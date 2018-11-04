@@ -20,6 +20,7 @@ public class Settings {
 
 	private static final String SEARCH_HOTKEY = "Search_Hotkey";
 	private static final String REPLACE_HOTKEY = "Replace_Hotkey";
+	private static final String SHOW_TYPE = "Show_Type";
 
 	private Properties properties;
 
@@ -36,6 +37,7 @@ public class Settings {
 		Properties properties = new Properties();
 		properties.setProperty(SEARCH_HOTKEY, new KeyEvent(true, false, "C").toString());
 		properties.setProperty(REPLACE_HOTKEY, new KeyEvent(true, false, "R").toString());
+		properties.setProperty(SHOW_TYPE, "false");
 		return properties;
 	}
 
@@ -47,6 +49,10 @@ public class Settings {
 		return KeyEvent.fromString(properties.getProperty(REPLACE_HOTKEY));
 	}
 
+	public boolean isShowType() {
+		return Boolean.parseBoolean(properties.getProperty(SHOW_TYPE));
+	}
+
 	public void setSearchHotkey(KeyEvent key) {
 		LOG.info("Setting search hotkey to [{}]", key);
 		properties.setProperty(SEARCH_HOTKEY, key.toString());
@@ -56,6 +62,12 @@ public class Settings {
 	public void setReplaceHotkey(KeyEvent key) {
 		LOG.info("Setting replace hotkey to [{}]", key);
 		properties.setProperty(REPLACE_HOTKEY, key.toString());
+		save();
+	}
+
+	public void setShowType(boolean showType) {
+		LOG.info("Setting show type to [{}]", showType);
+		properties.setProperty(SHOW_TYPE, String.valueOf(showType));
 		save();
 	}
 
