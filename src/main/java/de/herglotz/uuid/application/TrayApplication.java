@@ -87,7 +87,11 @@ class TrayApplication {
 	}
 
 	private void updateElements(Set<File> files) {
-		executorService.execute(() -> elementContainer.updateElements(files));
+		executorService.execute(() -> {
+			ui.showMessage("Updating registry...");
+			elementContainer.updateElements(files);
+			ui.showMessage("Update done.");
+		});
 	}
 
 	private void registerKeyListener() {
@@ -116,7 +120,7 @@ class TrayApplication {
 			ui.showError(result.getMessage());
 			break;
 		case ONE:
-			ui.showResult(result.getMessage());
+			ui.showMessage(result.getMessage());
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown SearchResult type: " + result.getType());
@@ -143,7 +147,7 @@ class TrayApplication {
 		String result = doReplacement(clipboard);
 		setClipboardContent(result);
 		LOG.debug("Replacement complete.");
-		ui.showResult("Replacement complete.");
+		ui.showMessage("Replacement complete.");
 	}
 
 	private String doReplacement(String clipboard) {

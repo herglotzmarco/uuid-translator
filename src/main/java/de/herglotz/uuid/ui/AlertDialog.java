@@ -50,12 +50,12 @@ public class AlertDialog {
 		contentPane.setBackground(new Color(200, 255, 255));
 	}
 
-	public void showResult(String result) {
-		showPopup(result); // TODO: handle result differently from error
+	public void showMessage(String message) {
+		showPopup(message); // TODO: handle message differently from error
 	}
 
 	public void showError(String error) {
-		showPopup(error); // TODO: handle result differently from error
+		showPopup(error); // TODO: handle message differently from error
 	}
 
 	private void showPopup(String name) {
