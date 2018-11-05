@@ -162,7 +162,7 @@ class TrayApplication {
 			String id = clipboard.substring(matcher.start(), matcher.end());
 			SearchResult search = searcher.searchForUUID(id);
 			if (search.getType() == SearchResultType.ONE) {
-				result = result.replace(id, search.getMessage());
+				result = result.replace(id, search.getElement().getName());
 			}
 		}
 		return result;
