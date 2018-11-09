@@ -71,7 +71,7 @@ class TrayApplication {
 	private BufferedImage getImageForTrayIcon() {
 		try {
 			return ImageIO.read(this.getClass().getClassLoader().getResource("icons/trayicon.png"));
-		} catch (IOException e) {
+		} catch (IllegalArgumentException | IOException e) {
 			LOG.warn("Icon for Tray Application could not be found", e);
 			return new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB);
 		}
