@@ -5,6 +5,7 @@ import java.awt.FlowLayout;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
+import java.util.stream.IntStream;
 
 import javax.swing.BorderFactory;
 import javax.swing.JDialog;
@@ -15,7 +16,7 @@ import javax.swing.Timer;
 public class AlertDialog {
 
 	private static final int ALERT_WIDTH = 300;
-	private static final int ALERT_HEIGHT = 100;
+	private static final int ALERT_HEIGHT = 150;
 	private static final int ALERT_TIMEOUT_MILLIS = 3000;
 
 	private JDialog dialog;
@@ -59,7 +60,7 @@ public class AlertDialog {
 	}
 
 	private void showPopup(String name) {
-		JLabel label = new JLabel(wrapText(name));
+		JLabel label = new JLabel(toReadableName(name));
 		dialog.add(label);
 
 		dialog.setVisible(true);
@@ -74,8 +75,20 @@ public class AlertDialog {
 		timer.start();
 	}
 
+	private String toReadableName(String name) {
+		String[] parts = name.split("/");
+		StringBuilder builder = new StringBuilder(parts[0]);
+		for (int i = 1; i < parts.length; i++) {
+			builder.append("<br/>");
+			IntStream.range(0, i).forEach(j -> builder.append("- "));
+			builder.append(parts[i]);
+		}
+		return wrapText(builder.toString());
+	}
+
 	private String wrapText(String name) {
-		return "<html><body style='width:" + (ALERT_WIDTH - 100) + "px'>" + name + "</body></html>";
+		return "<html><body style='width:" + (ALERT_WIDTH - 100) + "px'><p style='white-space: pre-wrap'>" + name
+				+ "</p></body></html>";
 	}
 
 }

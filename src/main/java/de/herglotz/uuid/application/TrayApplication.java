@@ -122,7 +122,7 @@ class TrayApplication {
 		case ONE:
 			String message = result.getElement().getName();
 			if (settings.isShowType()) {
-				message = result.getElement().getType() + " " + result.getElement().getName();
+				message = result.getElement().getType() + "/" + result.getElement().getName();
 			}
 			ui.showMessage(message);
 			break;
