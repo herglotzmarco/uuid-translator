@@ -17,6 +17,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.herglotz.uuid.settings.Settings;
+
 class SelectWorkspaceIcon extends MenuItem {
 
 	private static final long serialVersionUID = -1577055642923363355L;
@@ -24,17 +26,26 @@ class SelectWorkspaceIcon extends MenuItem {
 	private static final Logger LOG = LoggerFactory.getLogger(SelectWorkspaceIcon.class);
 
 	private Consumer<Set<File>> updateListener;
+	protected Settings settings;
 
-	public SelectWorkspaceIcon(Consumer<Set<File>> updateListener) {
-		super("Select Workspace");
+	protected SelectWorkspaceIcon(String title, Settings settings, Consumer<Set<File>> updateListener) {
+		super(title);
+		this.settings = settings;
 		this.updateListener = updateListener;
 		addActionListener(this::selectWorkspace);
 	}
 
+	public SelectWorkspaceIcon(Settings settings, Consumer<Set<File>> updateListener) {
+		this("Select Workspace", settings, updateListener);
+	}
+
 	private void selectWorkspace(ActionEvent event) {
 		File selectedFile = selectFile();
-		Set<File> files = gatherRuletreeFilesRecursively(selectedFile);
-		updateListener.accept(files);
+		if (selectedFile != null && selectedFile.exists()) {
+			Set<File> files = gatherRuletreeFilesRecursively(selectedFile);
+			settings.setLastWorkspace(selectedFile.getAbsolutePath());
+			updateListener.accept(files);
+		}
 	}
 
 	private Set<File> gatherRuletreeFilesRecursively(File selectedFile) {
@@ -50,11 +61,14 @@ class SelectWorkspaceIcon extends MenuItem {
 		}
 	}
 
-	private File selectFile() {
+	protected File selectFile() {
 		JFileChooser chooser = new JFileChooser();
 		chooser.setFileFilter(new FileNameExtensionFilter("Ruletree", "ruletree"));
 		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 		chooser.setMultiSelectionEnabled(false);
+		if (settings.getLastWorkspace() != null) {
+			chooser.setCurrentDirectory(new File(settings.getLastWorkspace()));
+		}
 		chooser.showOpenDialog(null);
 		File selectedFile = chooser.getSelectedFile();
 		return selectedFile;

@@ -21,6 +21,7 @@ public class Settings {
 	private static final String SEARCH_HOTKEY = "Search_Hotkey";
 	private static final String REPLACE_HOTKEY = "Replace_Hotkey";
 	private static final String SHOW_TYPE = "Show_Type";
+	private static final String LAST_WORKSPACE = "Last_Workspace";
 
 	private Properties properties;
 
@@ -51,6 +52,16 @@ public class Settings {
 
 	public boolean isShowType() {
 		return Boolean.parseBoolean(properties.getProperty(SHOW_TYPE));
+	}
+
+	public String getLastWorkspace() {
+		return properties.getProperty(LAST_WORKSPACE);
+	}
+
+	public void setLastWorkspace(String lastWorkspace) {
+		LOG.info("Setting last workspace to [{}]", lastWorkspace);
+		properties.setProperty(LAST_WORKSPACE, lastWorkspace);
+		save();
 	}
 
 	public void setSearchHotkey(KeyEvent key) {

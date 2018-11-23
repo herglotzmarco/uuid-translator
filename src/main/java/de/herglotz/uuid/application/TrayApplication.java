@@ -79,7 +79,8 @@ class TrayApplication {
 
 	private PopupMenu buildPopupMenu(TrayIcon trayIcon) {
 		PopupMenu menu = new PopupMenu();
-		menu.add(new SelectWorkspaceIcon(this::updateElements));
+		menu.add(new SelectWorkspaceIcon(settings, this::updateElements));
+		menu.add(new UpdateWorkspaceIcon(settings, this::updateElements));
 		menu.add(new SettingsIcon(settings, this::registerKeyListener));
 		menu.addSeparator();
 		menu.add(new ExitIcon(trayIcon));
