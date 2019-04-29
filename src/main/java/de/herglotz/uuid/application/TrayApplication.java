@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.herglotz.uuid.elements.ElementRegistry;
+import de.herglotz.uuid.elements.RegistryElement;
 import de.herglotz.uuid.jni.GlobalKeyListener;
+import de.herglotz.uuid.search.NameSearcher;
 import de.herglotz.uuid.search.SearchResult;
 import de.herglotz.uuid.search.SearchResultType;
 import de.herglotz.uuid.search.UUIDSearcher;
@@ -97,7 +100,8 @@ class TrayApplication {
 
 	private void registerKeyListener() {
 		GlobalKeyListener listener = GlobalKeyListener.instance();
-		listener.registerListener(settings.getSearchHotkey(), this::searchForUUID);
+		listener.registerListener(settings.getUUIDSearchHotkey(), this::searchForUUID);
+		listener.registerListener(settings.getNameSearchHotkey(), this::searchForName);
 		listener.registerListener(settings.getReplaceHotkey(), this::replaceAllUUIDs);
 	}
 
@@ -109,10 +113,21 @@ class TrayApplication {
 	private void searchForUUID(String searchString) {
 		UUIDSearcher searcher = new UUIDSearcher(elementContainer);
 		SearchResult result = searcher.searchForUUID(searchString);
-		processSearchResult(result);
+		processSearchResult(result, RegistryElement::getName);
 	}
 
-	private void processSearchResult(SearchResult result) {
+	private void searchForName() {
+		String searchString = getClipboardContent().trim();
+		executorService.execute(() -> searchForName(searchString));
+	}
+
+	private void searchForName(String searchString) {
+		NameSearcher searcher = new NameSearcher(elementContainer);
+		SearchResult result = searcher.searchForName(searchString);
+		processSearchResult(result, RegistryElement::getId);
+	}
+
+	private void processSearchResult(SearchResult result, Function<RegistryElement, String> displayConverter) {
 		switch (result.getType()) {
 		case INVALID:
 			return; // no search was needed
@@ -123,7 +138,7 @@ class TrayApplication {
 		case ONE:
 			String message = result.getElement().getName();
 			if (settings.isShowType()) {
-				message = result.getElement().getType() + "/" + result.getElement().getName();
+				message = result.getElement().getType() + "/" + displayConverter.apply(result.getElement());
 			}
 			ui.showMessage(message);
 			break;

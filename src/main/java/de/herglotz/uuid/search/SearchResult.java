@@ -19,7 +19,8 @@ public class SearchResult {
 	}
 
 	static SearchResult noResult(String searchString) {
-		return new SearchResult(String.format("Id containing [%s] is not present in selected workspace", searchString),
+		return new SearchResult(
+				String.format("Element containing [%s] is not present in selected workspace", searchString),
 				SearchResultType.EMPTY);
 	}
 
@@ -29,12 +30,12 @@ public class SearchResult {
 
 	static SearchResult multipleResults(int size, String searchString) {
 		return new SearchResult(
-				String.format("%s possibilities for SearchString [%s] in selected workspace", size, searchString),
+				String.format("%s possibilities for search String [%s] in selected workspace", size, searchString),
 				SearchResultType.MULTIPLE);
 	}
 
 	static SearchResult invalidUUID(String searchString) {
-		return new SearchResult(String.format("SearchString [%s] is not a valid UUID", searchString),
+		return new SearchResult(String.format("search String [%s] is not a valid UUID", searchString),
 				SearchResultType.INVALID);
 	}
 

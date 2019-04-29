@@ -18,7 +18,8 @@ public class Settings {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Settings.class);
 
-	private static final String SEARCH_HOTKEY = "Search_Hotkey";
+	private static final String UUID_SEARCH_HOTKEY = "Search_Hotkey";
+	private static final String NAME_SEARCH_HOTKEY = "Name_Search_Hotkey";
 	private static final String REPLACE_HOTKEY = "Replace_Hotkey";
 	private static final String SHOW_TYPE = "Show_Type";
 	private static final String LAST_WORKSPACE = "Last_Workspace";
@@ -36,14 +37,19 @@ public class Settings {
 
 	private Properties getDefaultProperties() {
 		Properties properties = new Properties();
-		properties.setProperty(SEARCH_HOTKEY, new KeyEvent(true, false, "C").toString());
+		properties.setProperty(UUID_SEARCH_HOTKEY, new KeyEvent(true, false, "C").toString());
+		properties.setProperty(NAME_SEARCH_HOTKEY, new KeyEvent(true, true, "H").toString());
 		properties.setProperty(REPLACE_HOTKEY, new KeyEvent(true, false, "R").toString());
 		properties.setProperty(SHOW_TYPE, "false");
 		return properties;
 	}
 
-	public KeyEvent getSearchHotkey() {
-		return KeyEvent.fromString(properties.getProperty(SEARCH_HOTKEY));
+	public KeyEvent getUUIDSearchHotkey() {
+		return KeyEvent.fromString(properties.getProperty(UUID_SEARCH_HOTKEY));
+	}
+
+	public KeyEvent getNameSearchHotkey() {
+		return KeyEvent.fromString(properties.getProperty(NAME_SEARCH_HOTKEY));
 	}
 
 	public KeyEvent getReplaceHotkey() {
@@ -64,9 +70,15 @@ public class Settings {
 		save();
 	}
 
-	public void setSearchHotkey(KeyEvent key) {
-		LOG.info("Setting search hotkey to [{}]", key);
-		properties.setProperty(SEARCH_HOTKEY, key.toString());
+	public void setUUIDSearchHotkey(KeyEvent key) {
+		LOG.info("Setting uuid search hotkey to [{}]", key);
+		properties.setProperty(UUID_SEARCH_HOTKEY, key.toString());
+		save();
+	}
+
+	public void setNameSearchHotkey(KeyEvent key) {
+		LOG.info("Setting name search hotkey to [{}]", key);
+		properties.setProperty(NAME_SEARCH_HOTKEY, key.toString());
 		save();
 	}
 

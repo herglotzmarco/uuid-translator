@@ -16,20 +16,33 @@ public class ElementRegistry {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ElementRegistry.class);
 
-	private Map<String, RegistryElement> elements;
+	private Map<String, RegistryElement> idsToElements;
+	private Map<String, RegistryElement> namesToElements;
 	private ElementParser parser;
 
 	public ElementRegistry() {
-		elements = new HashMap<>();
+		idsToElements = new HashMap<>();
+		namesToElements = new HashMap<>();
 		parser = null;
 	}
 
-	public Collection<RegistryElement> findElementsContaining(String searchString) {
-		RegistryElement element = elements.get(searchString);
+	public Collection<RegistryElement> findElementsWithId(String searchString) {
+		RegistryElement element = idsToElements.get(searchString);
 		if (element != null) {
 			return Collections.singleton(element);
 		}
-		return elements.entrySet().parallelStream()//
+		return idsToElements.entrySet().parallelStream()//
+				.filter(e -> e.getKey().contains(searchString))//
+				.map(Entry::getValue)//
+				.collect(Collectors.toList());
+	}
+
+	public Collection<RegistryElement> findElementsWithName(String searchString) {
+		RegistryElement element = namesToElements.get(searchString);
+		if (element != null) {
+			return Collections.singleton(element);
+		}
+		return namesToElements.entrySet().parallelStream()//
 				.filter(e -> e.getKey().contains(searchString))//
 				.map(Entry::getValue)//
 				.collect(Collectors.toList());
@@ -37,12 +50,17 @@ public class ElementRegistry {
 
 	public void updateElements(Set<File> files) {
 		LOG.debug("Updating registry for new workspace");
-		elements.clear();
+		idsToElements.clear();
 		files.stream()//
 				.map(parser::readAndParse)//
 				.flatMap(Collection::stream)//
-				.forEach(e -> elements.put(e.getId(), e));
+				.forEach(this::addElement);
 		LOG.debug("Updating registry done");
+	}
+
+	private void addElement(RegistryElement e) {
+		idsToElements.put(e.getId(), e);
+		namesToElements.put(e.getName(), e);
 	}
 
 }

@@ -8,32 +8,20 @@ import org.slf4j.LoggerFactory;
 import de.herglotz.uuid.elements.ElementRegistry;
 import de.herglotz.uuid.elements.RegistryElement;
 
-public class UUIDSearcher {
+public class NameSearcher {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UUIDSearcher.class);
+	private static final Logger LOG = LoggerFactory.getLogger(NameSearcher.class);
 
 	private ElementRegistry elementContainer;
 
-	public UUIDSearcher(ElementRegistry elementContainer) {
+	public NameSearcher(ElementRegistry elementContainer) {
 		this.elementContainer = elementContainer;
 	}
 
-	public SearchResult searchForUUID(String searchString) {
+	public SearchResult searchForName(String searchString) {
 		LOG.debug("Searching for String [{}]", searchString);
-		if (isPossibleUUID(searchString)) {
-			LOG.debug("String [{}] was a valid UUID. Searching registry", searchString);
-			Collection<RegistryElement> searchResults = elementContainer.findElementsWithId(searchString);
-			return processResults(searchResults, searchString);
-		} else {
-			LOG.debug("String [{}] was not a valid UUID. Search cancelled", searchString);
-			return SearchResult.invalidUUID(searchString);
-		}
-	}
-
-	private boolean isPossibleUUID(String searchString) {
-		boolean isId = searchString.length() >= 4; // at least 4 digits
-		isId &= searchString.matches("[\\-0-9a-fA-F]+"); // only hex digits or minus sign
-		return isId;
+		Collection<RegistryElement> searchResults = elementContainer.findElementsWithName(searchString);
+		return processResults(searchResults, searchString);
 	}
 
 	private SearchResult processResults(Collection<RegistryElement> searchResults, String searchString) {
