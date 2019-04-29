@@ -20,7 +20,8 @@ public class Settings {
 
 	private static final String UUID_SEARCH_HOTKEY = "Search_Hotkey";
 	private static final String NAME_SEARCH_HOTKEY = "Name_Search_Hotkey";
-	private static final String REPLACE_HOTKEY = "Replace_Hotkey";
+	private static final String UUID_REPLACE_HOTKEY = "Replace_Hotkey";
+	private static final String NAME_REPLACE_HOTKEY = "Name_Replace_Hotkey";
 	private static final String SHOW_TYPE = "Show_Type";
 	private static final String LAST_WORKSPACE = "Last_Workspace";
 
@@ -38,8 +39,9 @@ public class Settings {
 	private Properties getDefaultProperties() {
 		Properties properties = new Properties();
 		properties.setProperty(UUID_SEARCH_HOTKEY, new KeyEvent(true, false, "C").toString());
-		properties.setProperty(NAME_SEARCH_HOTKEY, new KeyEvent(true, true, "H").toString());
-		properties.setProperty(REPLACE_HOTKEY, new KeyEvent(true, false, "R").toString());
+		properties.setProperty(NAME_SEARCH_HOTKEY, new KeyEvent(true, true, "C").toString());
+		properties.setProperty(UUID_REPLACE_HOTKEY, new KeyEvent(true, false, "R").toString());
+		properties.setProperty(NAME_REPLACE_HOTKEY, new KeyEvent(true, true, "R").toString());
 		properties.setProperty(SHOW_TYPE, "false");
 		return properties;
 	}
@@ -52,8 +54,12 @@ public class Settings {
 		return KeyEvent.fromString(properties.getProperty(NAME_SEARCH_HOTKEY));
 	}
 
-	public KeyEvent getReplaceHotkey() {
-		return KeyEvent.fromString(properties.getProperty(REPLACE_HOTKEY));
+	public KeyEvent getUUIDReplaceHotkey() {
+		return KeyEvent.fromString(properties.getProperty(UUID_REPLACE_HOTKEY));
+	}
+
+	public KeyEvent getNameReplaceHotkey() {
+		return KeyEvent.fromString(properties.getProperty(NAME_REPLACE_HOTKEY));
 	}
 
 	public boolean isShowType() {
@@ -82,9 +88,15 @@ public class Settings {
 		save();
 	}
 
-	public void setReplaceHotkey(KeyEvent key) {
-		LOG.info("Setting replace hotkey to [{}]", key);
-		properties.setProperty(REPLACE_HOTKEY, key.toString());
+	public void setUUIDReplaceHotkey(KeyEvent key) {
+		LOG.info("Setting uuid replace hotkey to [{}]", key);
+		properties.setProperty(UUID_REPLACE_HOTKEY, key.toString());
+		save();
+	}
+
+	public void setNameReplaceHotkey(KeyEvent key) {
+		LOG.info("Setting name replace hotkey to [{}]", key);
+		properties.setProperty(NAME_REPLACE_HOTKEY, key.toString());
 		save();
 	}
 

@@ -29,11 +29,12 @@ class SettingsIcon extends MenuItem {
 		JDialog dialog = new JDialog();
 		dialog.setTitle("Settings");
 		dialog.setVisible(true);
-		dialog.setLayout(new GridLayout(4, 2));
+		dialog.setLayout(new GridLayout(5, 2));
 
 		createUUIDSearchHotkeySetting(dialog);
 		createNameSearchHotkeySetting(dialog);
-		createReplaceHotkeySetting(dialog);
+		createUUIDReplaceHotkeySetting(dialog);
+		createNameReplaceHotkeySetting(dialog);
 		createShowTypeCheckbox(dialog);
 		dialog.pack();
 	}
@@ -48,9 +49,14 @@ class SettingsIcon extends MenuItem {
 		dialog.add(new SettingsChooser(settings::getNameSearchHotkey, settings::setNameSearchHotkey, updateCallback));
 	}
 
-	private void createReplaceHotkeySetting(JDialog dialog) {
-		dialog.add(new Label("Replace Hotkey"));
-		dialog.add(new SettingsChooser(settings::getReplaceHotkey, settings::setReplaceHotkey, updateCallback));
+	private void createUUIDReplaceHotkeySetting(JDialog dialog) {
+		dialog.add(new Label("UUID Replace Hotkey"));
+		dialog.add(new SettingsChooser(settings::getUUIDReplaceHotkey, settings::setUUIDReplaceHotkey, updateCallback));
+	}
+
+	private void createNameReplaceHotkeySetting(JDialog dialog) {
+		dialog.add(new Label("Name Replace Hotkey"));
+		dialog.add(new SettingsChooser(settings::getNameReplaceHotkey, settings::setNameReplaceHotkey, updateCallback));
 	}
 
 	private void createShowTypeCheckbox(JDialog dialog) {

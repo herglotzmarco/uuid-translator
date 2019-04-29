@@ -1,5 +1,7 @@
 package de.herglotz.uuid.application;
 
+import static java.util.stream.Collectors.joining;
+
 import java.awt.AWTException;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
@@ -10,8 +12,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -102,7 +108,8 @@ class TrayApplication {
 		GlobalKeyListener listener = GlobalKeyListener.instance();
 		listener.registerListener(settings.getUUIDSearchHotkey(), this::searchForUUID);
 		listener.registerListener(settings.getNameSearchHotkey(), this::searchForName);
-		listener.registerListener(settings.getReplaceHotkey(), this::replaceAllUUIDs);
+		listener.registerListener(settings.getUUIDReplaceHotkey(), this::replaceAllUUIDs);
+		listener.registerListener(settings.getNameReplaceHotkey(), this::replaceAllNames);
 	}
 
 	private void searchForUUID() {
@@ -164,13 +171,13 @@ class TrayApplication {
 
 	private void replaceAllUUIDs(String clipboard) {
 		LOG.debug("Replacing all UUIDs");
-		String result = doReplacement(clipboard);
+		String result = doUUIDReplacement(clipboard);
 		setClipboardContent(result);
 		LOG.debug("Replacement complete.");
 		ui.showMessage("Replacement complete.");
 	}
 
-	private String doReplacement(String clipboard) {
+	private String doUUIDReplacement(String clipboard) {
 		Matcher matcher = Pattern.compile(UUID_REGEX).matcher(clipboard);
 		String result = new String(clipboard);
 		UUIDSearcher searcher = new UUIDSearcher(elementContainer);
@@ -182,6 +189,45 @@ class TrayApplication {
 			}
 		}
 		return result;
+	}
+
+	private void replaceAllNames() {
+		String clipboard = getClipboardContent().trim();
+		executorService.execute(() -> replaceAllNames(clipboard));
+	}
+
+	private void replaceAllNames(String clipboard) {
+		LOG.debug("Replacing all Names");
+		try {
+			String result = doNameReplacement(clipboard);
+			setClipboardContent(result);
+			LOG.debug("Replacement complete.");
+			ui.showMessage("Replacement complete.");
+		} catch (IOException e) {
+			LOG.error("Replacement failed", e);
+			ui.showError("Replacement failed");
+		}
+	}
+
+	private String doNameReplacement(String clipboard) throws IOException {
+		List<String> result = new ArrayList<>();
+		try (BufferedReader reader = new BufferedReader(new StringReader(clipboard))) {
+			NameSearcher searcher = new NameSearcher(elementContainer);
+			String line;
+			while (reader.ready()) {
+				line = reader.readLine();
+				if (line == null) {
+					break;
+				}
+				SearchResult searchResult = searcher.searchForName(line.trim());
+				if (searchResult.getType() == SearchResultType.ONE) {
+					result.add(searchResult.getElement().getId());
+				} else {
+					result.add(line);
+				}
+			}
+			return result.stream().collect(joining(System.lineSeparator()));
+		}
 	}
 
 	private void setClipboardContent(String newContent) {
