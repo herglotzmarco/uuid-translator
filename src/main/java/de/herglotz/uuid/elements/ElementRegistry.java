@@ -43,7 +43,7 @@ public class ElementRegistry {
 			return Collections.singleton(element);
 		}
 		return namesToElements.entrySet().parallelStream()//
-				.filter(e -> e.getKey().contains(searchString))//
+				.filter(e -> e.getKey().endsWith(searchString))//
 				.map(Entry::getValue)//
 				.collect(Collectors.toList());
 	}
