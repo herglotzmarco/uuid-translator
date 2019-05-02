@@ -143,7 +143,7 @@ class TrayApplication {
 			ui.showError(result.getMessage());
 			break;
 		case ONE:
-			String message = result.getElement().getName();
+			String message = displayConverter.apply(result.getElement());
 			if (settings.isShowType()) {
 				message = result.getElement().getType() + "/" + displayConverter.apply(result.getElement());
 			}
